@@ -52,7 +52,7 @@ extension FlikrClient {
                 }
                 
                 // pick a random page - Setting Page for next request for picture with same coordinates
-                let pageLimit = min(totalPages, 40)
+                let pageLimit = min(totalPages, 4000/21)
                 let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
                 
                 self.getPhotosFromFlikrFromRandomPage(bboxString: bboxStringValue, page: randomPage, completionHandlerForGetPhotos: completionHandlerForGetPhotos)

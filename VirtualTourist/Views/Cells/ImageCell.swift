@@ -12,9 +12,11 @@ import UIKit
 internal final class ImageCell : UICollectionViewCell, Cell {
     
     @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var imageActivityIndicator: UIActivityIndicatorView!
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        imageView.image = nil
     }
 }
 

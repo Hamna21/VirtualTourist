@@ -22,6 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let mapViewController = navigationController.topViewController as! MapViewController
         mapViewController.dataController = dataController
         
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+
+        
         return true
     }
     

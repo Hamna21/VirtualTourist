@@ -91,15 +91,18 @@ class PhotoAlbumViewController: UIViewController {
                         photo.url = result[FlikrClient.FlickrResponseKeys.MediumURL] as? String
                         photo.pin = self.pin
                     }
+                    //Working in background Context to save and download photos
                     //Saving photos to store
-                    self.dataController.viewContext.perform {
-                        try? self.dataController.viewContext.save()
+                    self.dataController.backgroundContext.perform{
+                        try? self.dataController.backgroundContext.save()
                         
                         //Downloading images from URL
                         DownloadImage.downloadImagesForUrl(self.fetchedResultsController.fetchedObjects!, self.dataController){
-                            self.activityIndicator.stopAnimating()
-                            self.newCollectionBtn.isEnabled = true
                             
+                            performUIUpdatesOnMain {
+                                self.activityIndicator.stopAnimating()
+                                self.newCollectionBtn.isEnabled = true
+                            }
                         }
                     }
                     
@@ -111,21 +114,7 @@ class PhotoAlbumViewController: UIViewController {
         
     }
     
-    
     @IBAction func getNewCollectionBtnTapped(_ sender: Any) {
-        /*let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-        let deletePredicate = NSPredicate(format: "pin == %@", pin)
-        deleteFetch.predicate = deletePredicate
-        
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
-        
-        do{
-            let result = try dataController.viewContext.execute(deleteRequest)
-            try dataController.viewContext.save()
-        }catch{
-            print("There was an error")
-        }*/
-        
         activityIndicator.startAnimating()
         newCollectionBtn.isEnabled = false
         
@@ -136,10 +125,7 @@ class PhotoAlbumViewController: UIViewController {
         
         getLocationPhotos()
     }
-        
-    
 }
-
 
 extension PhotoAlbumViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     // MARK: - Collection view data source
@@ -154,8 +140,12 @@ extension PhotoAlbumViewController: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell =  collectionView.dequeueReusableCell(withReuseIdentifier: ImageCell.defaultReuseIdentifier, for: indexPath) as! ImageCell
         
+        cell.imageActivityIndicator.hidesWhenStopped = true
+        cell.imageActivityIndicator.startAnimating()
+        
         let photo = fetchedResultsController.object(at: indexPath)
         if let imageData = photo.image {
+            cell.imageActivityIndicator.stopAnimating()
             cell.imageView.image = UIImage(data: imageData)
         }
         return cell
@@ -168,8 +158,6 @@ extension PhotoAlbumViewController: UICollectionViewDelegate, UICollectionViewDa
             self.dataController.viewContext.delete(photoToBeDeleted)
             try? self.dataController.viewContext.save()
         }
-       
-        
     }
 }
 

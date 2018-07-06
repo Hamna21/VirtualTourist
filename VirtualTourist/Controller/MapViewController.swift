@@ -28,7 +28,6 @@ class MapViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         navigationController?.setToolbarHidden(true, animated: false)
         
-        mapView.delegate = self
         performFetchRequest()
     }
     
@@ -41,7 +40,7 @@ class MapViewController: UIViewController {
     //Adding gesture recognizer to recognize addition of pin on map
     func addGestureRecognizer(){
         let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(addAnnotation(_:)))
-        longGesture.minimumPressDuration = 2.0
+        longGesture.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longGesture)
     }
     
@@ -62,6 +61,10 @@ extension MapViewController: MKMapViewDelegate {
     
     //Adding user tapped location (annotation) on map
     @objc func addAnnotation(_ longGesture: UIGestureRecognizer){
+        if(longGesture.state != .began){
+            return
+        }
+        
         let touchPoint = longGesture.location(in: mapView)
         let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
         

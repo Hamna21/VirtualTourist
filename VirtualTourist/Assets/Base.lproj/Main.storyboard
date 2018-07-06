@@ -41,6 +41,9 @@
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="rJW-GN-wff">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <connections>
+                                    <outlet property="delegate" destination="DOh-np-BrF" id="fq9-z1-Ing"/>
+                                </connections>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -117,14 +120,20 @@
                                                         <constraint firstAttribute="width" secondItem="UcA-Ah-Yrf" secondAttribute="height" multiplier="1:1" id="dpf-xv-6WV"/>
                                                     </constraints>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="8wq-5Z-Bmp" userLabel="Image Activity Indicator">
+                                                    <rect key="frame" x="48" y="32.5" width="20" height="20"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                         </view>
                                         <constraints>
+                                            <constraint firstItem="8wq-5Z-Bmp" firstAttribute="centerY" secondItem="hXc-3k-5HR" secondAttribute="centerY" id="4N4-LX-1d9"/>
                                             <constraint firstItem="UcA-Ah-Yrf" firstAttribute="top" secondItem="hXc-3k-5HR" secondAttribute="top" id="9mf-tc-ETL"/>
                                             <constraint firstItem="UcA-Ah-Yrf" firstAttribute="centerX" secondItem="hXc-3k-5HR" secondAttribute="centerX" id="AM4-6y-n59"/>
                                             <constraint firstItem="UcA-Ah-Yrf" firstAttribute="centerY" secondItem="hXc-3k-5HR" secondAttribute="centerY" id="Av2-qk-w9J"/>
+                                            <constraint firstItem="8wq-5Z-Bmp" firstAttribute="centerX" secondItem="hXc-3k-5HR" secondAttribute="centerX" id="GjV-pO-fAu"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="imageActivityIndicator" destination="8wq-5Z-Bmp" id="6qe-KB-828"/>
                                             <outlet property="imageView" destination="UcA-Ah-Yrf" id="E8Q-64-i6T"/>
                                         </connections>
                                     </collectionViewCell>
