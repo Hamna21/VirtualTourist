@@ -28,6 +28,9 @@ class MapViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         navigationController?.setToolbarHidden(true, animated: false)
         
+        //Removing annotations before adding them
+        mapView.removeAnnotations(annotations)
+        
         performFetchRequest()
     }
     
@@ -40,7 +43,6 @@ class MapViewController: UIViewController {
     //Adding gesture recognizer to recognize addition of pin on map
     func addGestureRecognizer(){
         let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(addAnnotation(_:)))
-        longGesture.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longGesture)
     }
     

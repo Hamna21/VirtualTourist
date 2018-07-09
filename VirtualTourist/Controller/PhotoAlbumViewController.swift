@@ -35,7 +35,7 @@ class PhotoAlbumViewController: UIViewController {
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [sortDescriptor]
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.backgroundContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do{
            try fetchedResultsController.performFetch()
@@ -81,37 +81,36 @@ class PhotoAlbumViewController: UIViewController {
                 guard errorString == nil else {
                     self.imageLabel.text = errorString
                     return
+                    
                 }
                 if count == 0 {
                     self.imageLabel.text = "No Pictures Found."
-                } else {
-                    //Generating photo object for each result
-                    for result in results!{
-                        let photo = Photo(context: self.dataController.viewContext)
-                        photo.url = result[FlikrClient.FlickrResponseKeys.MediumURL] as? String
-                        photo.pin = self.pin
-                    }
-                    //Working in background Context to save and download photos
-                    //Saving photos to store
-                    self.dataController.backgroundContext.perform{
-                        try? self.dataController.backgroundContext.save()
-                        
-                        //Downloading images from URL
-                        DownloadImage.downloadImagesForUrl(self.fetchedResultsController.fetchedObjects!, self.dataController){
-                            
-                            performUIUpdatesOnMain {
-                                self.activityIndicator.stopAnimating()
-                                self.newCollectionBtn.isEnabled = true
-                            }
-                        }
-                    }
-                    
+                    return
                 }
                 
             }
+            //Generating photo object for each result
+            for result in results!{
+                let photo = Photo(context: self.dataController.backgroundContext)
+                photo.url = result[FlikrClient.FlickrResponseKeys.MediumURL] as? String
+                photo.pin = self.pin
+            }
+            //Working in background Context to save and download photos
+            //Saving photos to store
+            self.dataController.backgroundContext.perform{
+                try? self.dataController.backgroundContext.save()
+                
+                //Downloading images from URL
+                DownloadImage.downloadImagesForUrl(self.fetchedResultsController.fetchedObjects!, self.dataController){
+                    
+                    performUIUpdatesOnMain {
+                        self.activityIndicator.stopAnimating()
+                        self.newCollectionBtn.isEnabled = true
+                    }
+                }
+            }
             
         }
-        
     }
     
     @IBAction func getNewCollectionBtnTapped(_ sender: Any) {
