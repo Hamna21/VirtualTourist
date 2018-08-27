@@ -13,8 +13,9 @@ class DownloadImage{
     class func downloadImagesForUrl(_ photos: [Photo], _ dataController: DataController,completionHandlerForDownload: @escaping() -> Void) {
         for photo in photos {
             if let url = URL(string: photo.url!),let imageData = try? Data(contentsOf: url){
+                print(url)
                 photo.image = imageData
-                try? dataController.backgroundContext.save()
+                try? dataController.viewContext.save()
             }
         }
         completionHandlerForDownload()

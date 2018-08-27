@@ -1,5 +1,4 @@
-//
-//  PhotoAlbumViewController.swift
+//PhotoAlbumViewController.swift
 //  VirtualTourist
 //
 //  Created by Hamna Usmani on 7/2/18.
@@ -35,10 +34,10 @@ class PhotoAlbumViewController: UIViewController {
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [sortDescriptor]
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.backgroundContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do{
-           try fetchedResultsController.performFetch()
+            try fetchedResultsController.performFetch()
         }catch {
             fatalError(error.localizedDescription)
         }
@@ -81,38 +80,35 @@ class PhotoAlbumViewController: UIViewController {
                 guard errorString == nil else {
                     self.imageLabel.text = errorString
                     return
-                    
                 }
                 if count == 0 {
                     self.imageLabel.text = "No Pictures Found."
-                    return
-                }
-                
-            }
-            //Generating photo object for each result
-            for result in results!{
-                let photo = Photo(context: self.dataController.backgroundContext)
-                photo.url = result[FlikrClient.FlickrResponseKeys.MediumURL] as? String
-                photo.pin = self.pin
-            }
-            //Working in background Context to save and download photos
-            //Saving photos to store
-            self.dataController.backgroundContext.perform{
-                try? self.dataController.backgroundContext.save()
-                
-                //Downloading images from URL
-                DownloadImage.downloadImagesForUrl(self.fetchedResultsController.fetchedObjects!, self.dataController){
-                    
-                    performUIUpdatesOnMain {
-                        self.activityIndicator.stopAnimating()
-                        self.newCollectionBtn.isEnabled = true
+                } else {
+                    //Generating photo object for each result
+                    for result in results!{
+                        let photo = Photo(context: self.dataController.viewContext)
+                        photo.url = result[FlikrClient.FlickrResponseKeys.MediumURL] as? String
+                        photo.pin = self.pin
                     }
+                    //Saving photos to store
+                    self.dataController.viewContext.perform {
+                        try? self.dataController.viewContext.save()
+                        
+                        //Downloading images from URL
+                        DownloadImage.downloadImagesForUrl(self.fetchedResultsController.fetchedObjects!, self.dataController){
+                            self.activityIndicator.stopAnimating()
+                            self.newCollectionBtn.isEnabled = true
+                            
+                        }
+                    }
+                    
                 }
+                
             }
             
         }
+        
     }
-    
     @IBAction func getNewCollectionBtnTapped(_ sender: Any) {
         activityIndicator.startAnimating()
         newCollectionBtn.isEnabled = false
@@ -124,7 +120,10 @@ class PhotoAlbumViewController: UIViewController {
         
         getLocationPhotos()
     }
+    
+    
 }
+
 
 extension PhotoAlbumViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     // MARK: - Collection view data source
@@ -144,8 +143,8 @@ extension PhotoAlbumViewController: UICollectionViewDelegate, UICollectionViewDa
         
         let photo = fetchedResultsController.object(at: indexPath)
         if let imageData = photo.image {
-            cell.imageActivityIndicator.stopAnimating()
             cell.imageView.image = UIImage(data: imageData)
+            cell.imageActivityIndicator.stopAnimating()
         }
         return cell
     }
@@ -157,6 +156,8 @@ extension PhotoAlbumViewController: UICollectionViewDelegate, UICollectionViewDa
             self.dataController.viewContext.delete(photoToBeDeleted)
             try? self.dataController.viewContext.save()
         }
+        
+        
     }
 }
 
@@ -171,7 +172,7 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
-            case .insert:
+        case .insert:
             insertedIndexPaths.append(newIndexPath!)
             break
         case .delete:
@@ -204,4 +205,5 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     }
     
 }
+
 
